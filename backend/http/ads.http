@@ -1,0 +1,134 @@
+// AD
+
+GET http://localhost:5000/ads
+
+###
+
+GET http://localhost:5000/ads/12
+
+###
+
+POST http://localhost:5000/ads
+Content-Type: application/json
+
+{
+    "title": "Vélo BMC",
+    "description": "Vends vélo BMC neuf",
+    "owner": "Guy",
+    "price": 1500,
+    "picture": "Vélo.webp",
+    "location": "Bordeaux",
+    "category":   {
+    "id": 5
+  }
+}
+
+###
+
+PATCH http://localhost:5000/ads/12
+Content-Type: application/json
+
+{
+    "picture": "peugeot.webp"
+}
+
+###
+
+DELETE http://localhost:5000/ads/27
+Content-Type: application/json
+
+###
+
+PUT http://localhost:5000/ads/1
+Content-Type: application/json
+
+{
+    "title": "essai pull blanc",
+    "description": "Vends pull blanc neuf",
+    "owner": "Pierre Quignon",
+    "price": 200,
+    "picture": "pullblanc.jpg",
+    "location": "Paris",
+    "category_id": 3
+}
+
+###
+
+PATCH http://localhost:500/ads/23
+Content-Type: application/json
+
+{
+    "title": "Vélo decathlon",
+    "description": "Vends vieux vélo decathlon en bon état",
+    "owner": "Pierre Quignon",
+    "price": 200,
+    "picture": "velo_decathlon.jpg",
+    "location": "Paris",
+    "category": "Sports et Loisirs"
+}
+
+### // CATEGORY
+
+GET http://localhost:5000/categories
+
+###
+
+POST http://localhost:5000/categories
+Content-Type: application/json
+
+{
+    "type": "Meubles"
+}
+
+###
+
+PUT http://localhost:5000/categories/3
+Content-Type: application/json
+
+{
+    "type": "Sport"
+}
+
+###
+
+DELETE http://localhost:5000/categories/2
+Content-Type: application/json
+
+// TAG
+
+###
+
+GET http://localhost:5000/tags
+
+###
+
+POST http://localhost:5000/tags
+Content-Type: application/json
+
+{
+  "content": "Couleur bleu"
+}
+
+###
+
+PATCH http://localhost:5000/tags/1
+Content-Type: application/json
+
+{
+  "content": "Couleur jaune"
+}
+
+###
+
+
+PUT http://localhost:5000/tags/1
+Content-Type: application/json
+
+{
+ "content": "Couleur noir"
+}
+
+###
+
+DELETE http://localhost:5000/tags/1
+Content-Type: application/json
