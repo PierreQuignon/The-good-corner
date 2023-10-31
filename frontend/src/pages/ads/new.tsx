@@ -1,6 +1,7 @@
 import { CategoryType } from "@/components/Category";
 import { Layout } from "@/components/Layout";
 import axios from "axios";
+import Link from "next/link";
 import { useRouter } from "next/router";
 import { FormEvent, useEffect, useState } from "react";
 
@@ -53,7 +54,6 @@ export default function NewAd() {
       owner,
       category: { id: Number(categoryId) },
     };
-    console.log(data, "data");
 
     if (data.title.trim().length < 3) {
       setError("title");
@@ -81,6 +81,7 @@ export default function NewAd() {
   return (
     <Layout title="Nouvelle offre">
       <main className="main-content">
+      <Link href={`/`}>Retour aux annonces</Link>
         {hasBeenSent ? (
           <p>Annonce créé</p>
         ) : (

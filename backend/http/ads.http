@@ -34,7 +34,7 @@ Content-Type: application/json
 
 ###
 
-DELETE http://localhost:5000/ads/27
+DELETE http://localhost:5000/ads/35
 Content-Type: application/json
 
 ###
