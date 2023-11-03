@@ -1,46 +1,42 @@
 import React, { useEffect, useState } from "react";
 import { AdCard, AdCardProps } from "./AdCard";
-import axios from "axios";
 import { BsTrash3 } from "react-icons/bs";
 import Link from "next/link";
+import { useQuery, useMutation } from "@apollo/client";
+import { queryAllAds } from "@/GraphQL/queryAllAds";
+import { mutationDeleteAd } from "@/GraphQL/mutationDeleteAd";
+// import { queryAdsByCategory } from "@/GraphQL/adsByCategory";
 
 export function RecentAds(): React.ReactNode {
   const [totalPrice, setTotalPrice] = useState(0);
-  const [ads, setAds] = useState<AdCardProps[]>([]);
-  const [idAdDelete, setidAdDelete] = useState<number>();
+  const [idAdDelete, setidAdDelete] = useState<number | null>(null);
 
-  async function fetchAds() {
-    await axios
-      .get("http://localhost:5000/ads")
-      .then((response) => {
-        setAds(response.data);
-      })
-      .catch((err) => {
-        console.error(err);
-      });
-  }
+  const { data: dataAllAds } = useQuery<{ items: AdCardProps[] }>(queryAllAds);
+  const ads = dataAllAds ? dataAllAds.items : [];
+
+  // const { data: dataAdsByCategory } = useQuery<{ items: AdCardProps[] }>(queryAdsByCategory);
+  // const adsByCategory = dataAdsByCategory ? dataAdsByCategory.items : [];
+
+  const [doDelete] = useMutation(mutationDeleteAd, {
+    refetchQueries: [queryAllAds],
+  });
 
   useEffect(() => {
-    fetchAds();
-  }, []);
-
-  useEffect(() => {
-    if (idAdDelete !== undefined) {
-      axios
-        .delete(`http://localhost:5000/ads/${idAdDelete}`)
-        .then(() => {
-          fetchAds();
-        })
-        .catch((err) => {
-          console.error(err);
+    async function deleteAd() {
+      if (idAdDelete !== null) {
+        await doDelete({
+          variables: {
+            deleteAdId: idAdDelete,
+          },
         });
+        setidAdDelete(null);
+      }
     }
-  }, [idAdDelete]);
+    deleteAd();
+  }, [idAdDelete, doDelete]);
 
   return (
     <main className="main-content">
-      <h2>Annonces récentes</h2>
-      <p>Prix total des annonces sélectionnées : {totalPrice} €</p>
       <section className="recent-ads">
         {ads.map((ad) => (
           <React.Fragment key={ad.id}>

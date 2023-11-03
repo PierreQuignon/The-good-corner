@@ -1,21 +1,14 @@
 import Link from "next/link";
 import { Category, CategoryType } from "./Category";
-import axios from "axios";
-import React, { useEffect, useState } from "react";
+import { useQuery } from "@apollo/client";
+import { queryCategories } from "@/GraphQL/queryCategories";
+import React from "react";
 
 function Header(): React.ReactNode {
-  const [categories, setCategories] = useState<CategoryType[]>([]);
-
-  useEffect(() => {
-    axios
-      .get("http://localhost:5000/categories")
-      .then((result) => {
-        setCategories(result.data);
-      })
-      .catch((err) => {
-        console.error(err);
-      });
-  }, []);
+  const { loading, error, data } = useQuery<{ items: CategoryType[] }>(
+    queryCategories
+  );
+  const categories = data ? data.items : [];
 
   return (
     <header className="header">
@@ -49,14 +42,12 @@ function Header(): React.ReactNode {
       <nav className="categories-navigation">
         {categories.map((categ, index) => (
           <React.Fragment key={categ.id}>
-            <Category
-              id={categ.id}
-              type={categ.type}
-              onClick={() => alert("Clicked")}
-            />
+            <Category id={categ.id} type={categ.type} onClick={() => {}} />
             {index < categories.length - 1 ? "•" : ""}
           </React.Fragment>
         ))}
+        {loading ? <p>Loading...</p> : []}
+        {error ? <p>Error : {error.message}</p> : []}
       </nav>
     </header>
   );

@@ -1,9 +1,11 @@
 import { CategoryType } from "@/components/Category";
 import { Layout } from "@/components/Layout";
-import axios from "axios";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useEffect, useMemo, useState } from "react";
+import { queryCategories } from "@/GraphQL/queryCategories";
+import { gql, useMutation, useQuery } from "@apollo/client";
+import { queryAllAds } from "@/GraphQL/queryAllAds";
 
 type AdFormData = {
   title: string;
@@ -14,9 +16,15 @@ type AdFormData = {
   owner: string;
   category: { id: number };
 };
+const mutationCreateAd = gql`
+  mutation createAd($data: AdInput!) {
+    item: createAd(data: $data) {
+      id
+    }
+  }
+`;
 
 export default function NewAd() {
-  const [categories, setCategories] = useState<CategoryType[]>([]);
   const [error, setError] = useState<"title" | "price">();
   const [hasBeenSent, setHasBeenSent] = useState(false);
 
@@ -24,23 +32,30 @@ export default function NewAd() {
   const [description, setDescription] = useState("");
   const [picture, setpicture] = useState("");
   const [price, setPrice] = useState(0);
-  const [categoryId, setCategoryId] = useState<null | number>(null);
-
   const [location, setLocation] = useState("");
   const [owner, setOwner] = useState("");
+  const [categoryId, setCategoryId] = useState<null | number>(null);
 
   const router = useRouter();
 
-  async function fetchCategories() {
-    const result = await axios.get<CategoryType[]>(
-      "http://localhost:5000/categories"
-    );
-    setCategories(result.data);
-  }
+  const { data: dataCategories } = useQuery<{ items: CategoryType[] }>(
+    queryCategories
+  );
+  const categories = useMemo(
+    () => (dataCategories ? dataCategories.items : []),
+    [dataCategories]
+  );
 
   useEffect(() => {
-    fetchCategories();
-  }, []);
+    if (categories.length) {
+      setCategoryId(categories[0].id);
+    }
+  }, [categories]);
+  console.log(categoryId, "categoryId");
+
+  const [doCreate] = useMutation(mutationCreateAd, {
+    refetchQueries: [queryAllAds],
+  });
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -60,8 +75,25 @@ export default function NewAd() {
     } else if (data.price < 0) {
       setError("price");
     } else {
-      const result = await axios.post("http://localhost:5000/ads", data);
-      if ("id" in result.data) {
+      const result = await doCreate({
+        variables: {
+          data: {
+            title: title,
+            description: description,
+            owner: owner,
+            price: price,
+            picture: picture,
+            location: location,
+            category: categoryId
+              ? {
+                  id: categoryId,
+                }
+              : null,
+            tags: [],
+          },
+        },
+      });
+      if ("id" in result.data.item) {
         setTitle("");
         setDescription("");
         setPrice(0);
@@ -69,11 +101,10 @@ export default function NewAd() {
         setCategoryId(null);
         setOwner("");
         setLocation("");
-
         setHasBeenSent(true);
         setTimeout(() => {
-          router.push(`/ads/${result.data.id}`);
-        }, 5000);
+          router.push(`/ads/${result.data.item.id}`);
+        }, 1000);
       }
     }
   }
@@ -81,9 +112,9 @@ export default function NewAd() {
   return (
     <Layout title="Nouvelle offre">
       <main className="main-content">
-      <Link href={`/`}>Retour aux annonces</Link>
+        <Link href={`/`}>Retour aux annonces</Link>
         {hasBeenSent ? (
-          <p>Annonce créé</p>
+          <p>Création de votre annonce en cours...</p>
         ) : (
           <>
             <p>Poster une nouvelle offre</p>

@@ -1,25 +1,29 @@
 import { AdType } from "@/components/AdCard";
-import axios from "axios";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { useQuery, gql } from "@apollo/client";
+
+const queryAd = gql`
+  query ad($id: ID!) {
+    item: ad(id: $id) {
+      id
+      price
+      title
+    }
+  }
+`;
 
 export default function Ad() {
-  const [ad, setAd] = useState<AdType>();
-
   const router = useRouter();
   const adId = router.query.id as string;
 
-  async function fetchAd() {
-    const result = await axios.get<AdType>(`http://localhost:5000/ads/${adId}`);
-    setAd(result.data);
-  }
-
-  useEffect(() => {
-    if (adId !== undefined) {
-      fetchAd();
-    }
-  }, [adId]);
+  const { data } = useQuery<{ item: AdType }>(queryAd, {
+    variables: {
+      id: adId,
+    },
+    skip: adId === undefined,
+  });
+  const ad = data ? data.item : null;
 
   return (
     <main className="main-content">
