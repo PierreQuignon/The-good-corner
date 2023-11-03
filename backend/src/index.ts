@@ -10,10 +10,11 @@ import { ApolloServer } from "@apollo/server";
 import { startStandaloneServer } from "@apollo/server/standalone";
 import { buildSchema } from "type-graphql";
 import { AdsResolver } from "./resolvers/Ads";
+import { CategoriessResolver } from "./resolvers/Category";
 
 async function start() {
   const schema = await buildSchema({
-    resolvers: [TagsResolver, AdsResolver],
+    resolvers: [TagsResolver, AdsResolver, CategoriessResolver],
   });
 
   const server = new ApolloServer({

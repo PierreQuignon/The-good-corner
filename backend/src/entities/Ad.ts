@@ -10,6 +10,7 @@ import {
 import { Category } from "./Category";
 import { Tag } from "./Tag";
 import { Field, ID, InputType, Int, ObjectType } from "type-graphql";
+import { ObjectId } from "./ObjectId";
 
 @Entity()
 @ObjectType()
@@ -47,7 +48,7 @@ export class Ad extends BaseEntity {
   createdAt!: string;
 
   @ManyToOne(() => Category, (category) => category.ads)
-  @Field(() => Category)
+  @Field(() => Category, {nullable: true})
   category!: Category;
 
   @ManyToMany(() => Tag, (tag) => tag.ads)
@@ -75,4 +76,37 @@ export class AdInput {
 
   @Field()
   location!: string;
+
+  @Field()
+  category!: ObjectId;
+
+  @Field(() => [ObjectId])
+  tags!: ObjectId[];
+}
+
+@InputType()
+export class AdUpdateInput {
+  @Field()
+  title!: string;
+
+  @Field()
+  description!: string;
+
+  @Field()
+  owner!: string;
+
+  @Field(() => Int)
+  price!: number;
+
+  @Field()
+  picture!: string;
+
+  @Field()
+  location!: string;
+
+  @Field()
+  category!: ObjectId;
+
+  @Field(() => [ObjectId])
+  tags!: ObjectId[];
 }
