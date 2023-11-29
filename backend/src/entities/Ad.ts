@@ -48,7 +48,7 @@ export class Ad extends BaseEntity {
   createdAt!: string;
 
   @ManyToOne(() => Category, (category) => category.ads)
-  @Field(() => Category, {nullable: true})
+  @Field(() => Category, { nullable: true })
   category!: Category;
 
   @ManyToMany(() => Tag, (tag) => tag.ads)
@@ -109,4 +109,19 @@ export class AdUpdateInput {
 
   @Field(() => [ObjectId])
   tags!: ObjectId[];
+}
+
+@InputType()
+export class AdsWhere {
+  @Field(() => [ID], { nullable: true })
+  categoryIn?: number[];
+
+  @Field(() => String, { nullable: true })
+  searchTitle?: string;
+
+  @Field(() => Int, { nullable: true })
+  priceGte?: number;
+
+  @Field(() => Int, { nullable: true })
+  priceLte?: number;
 }

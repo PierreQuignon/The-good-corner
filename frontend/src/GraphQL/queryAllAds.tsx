@@ -1,8 +1,8 @@
 import { gql } from "@apollo/client";
 
 export const queryAllAds = gql`
-  query Query {
-    items: allAds {
+  query ads($where: AdsWhere) {
+    items: allAds(where: $where) {
       id
       title
       description

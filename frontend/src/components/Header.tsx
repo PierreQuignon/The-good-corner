@@ -42,7 +42,7 @@ function Header(): React.ReactNode {
       <nav className="categories-navigation">
         {categories.map((categ, index) => (
           <React.Fragment key={categ.id}>
-            <Category id={categ.id} type={categ.type} onClick={() => {}} />
+            <Category id={categ.id} type={categ.type} />
             {index < categories.length - 1 ? "•" : ""}
           </React.Fragment>
         ))}

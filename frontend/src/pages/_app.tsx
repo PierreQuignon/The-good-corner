@@ -18,9 +18,7 @@ function App({ Component, pageProps }: AppProps) {
 
   return (
     <ApolloProvider client={client}>
-      <Layout title={"the good corner"}>
         <Component {...pageProps}/>
-      </Layout>
     </ApolloProvider>
   );
 }

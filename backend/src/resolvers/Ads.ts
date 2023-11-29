@@ -1,14 +1,27 @@
 import { Arg, ID, Mutation, Query, Resolver } from "type-graphql";
-import { Ad, AdInput, AdUpdateInput } from "../entities/Ad";
+import { Ad, AdInput, AdUpdateInput, AdsWhere } from "../entities/Ad";
 import { merge } from "../utils";
 import { validate } from "class-validator";
+import { In } from "typeorm";
 
 @Resolver(Ad)
 export class AdsResolver {
   @Query(() => [Ad])
-  async allAds(): Promise<Ad[]> {
+  async allAds(
+    @Arg("where", { nullable: true }) where?: AdsWhere
+  ): Promise<Ad[]> {
+    const queryWhere: any = {};
+
+    if (where?.categoryIn) {
+      queryWhere.category = { id: In(where.categoryIn) };
+    }
+
     const ads = await Ad.find({
-      relations: { tags: true, category: true },
+      where: queryWhere,
+      relations: {
+        category: true,
+        tags: true,
+      },
     });
     return ads;
   }
