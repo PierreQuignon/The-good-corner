@@ -25,6 +25,16 @@ export default function Ad(): React.ReactNode {
           <>
             <h2>{ad.title}</h2>
             <p>{ad.price} €</p>
+            <Link
+              href={`/ads/${ad.id}/edit`}
+              className="category-navigation-link"
+            >
+              Modifier cette annonce
+            </Link>
+            <br />
+            <Link href={`/`} className="category-navigation-link">
+              Retour aux annonces
+            </Link>
           </>
         ) : adId ? (
           "Chargement/erreur"

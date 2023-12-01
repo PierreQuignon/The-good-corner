@@ -6,29 +6,33 @@ import { FormEvent, useEffect, useMemo, useState } from "react";
 import { queryCategories } from "@/GraphQL/queryCategories";
 import { useMutation, useQuery } from "@apollo/client";
 import { queryAllAds } from "@/GraphQL/queryAllAds";
-import { mutationCreateAd } from "@/GraphQL/CreateAd";
+import { mutationUpdateAd } from "@/GraphQL/UpdateAd";
 
-type AdFormData = {
+export type AdFormData = {
+  id?: string;
   title: string;
   description: string;
   picture: string;
   price: number;
   location: string;
   owner: string;
-  category: { id: number };
+  category: { id: number; type: string };
 };
 
-export default function NewAd() {
+export default function EditAd(props: { ad: AdFormData }) {
   const [error, setError] = useState<"title" | "price">();
   const [hasBeenSent, setHasBeenSent] = useState(false);
 
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [picture, setpicture] = useState("");
-  const [price, setPrice] = useState(0);
-  const [location, setLocation] = useState("");
-  const [owner, setOwner] = useState("");
-  const [categoryId, setCategoryId] = useState<null | number>(null);
+  const [title, setTitle] = useState<string>(props.ad.title);
+  const [description, setDescription] = useState<string>(props.ad.description);
+  const [picture, setpicture] = useState<string>(props.ad.picture);
+  const [price, setPrice] = useState<number>(props.ad.price);
+  const [location, setLocation] = useState<string>(props.ad.location);
+  const [owner, setOwner] = useState<string>(props.ad.owner);
+  const [categoryId, setCategoryId] = useState<null | number>(
+    props.ad.category.id
+  );
+  const [category, setCategory] = useState<string>(props.ad.category.type);
 
   const router = useRouter();
 
@@ -45,9 +49,8 @@ export default function NewAd() {
       setCategoryId(categories[0].id);
     }
   }, [categories]);
-  console.log(categoryId, "categoryId");
 
-  const [doCreate] = useMutation(mutationCreateAd, {
+  const [doUpdate] = useMutation(mutationUpdateAd, {
     refetchQueries: [queryAllAds],
   });
 
@@ -61,7 +64,7 @@ export default function NewAd() {
       price,
       location,
       owner,
-      category: { id: Number(categoryId) },
+      category: { id: Number(categoryId), type: String(category) },
     };
 
     if (data.title.trim().length < 3) {
@@ -69,7 +72,7 @@ export default function NewAd() {
     } else if (data.price < 0) {
       setError("price");
     } else {
-      const result = await doCreate({
+      const result = await doUpdate({
         variables: {
           data: {
             title: title,
@@ -85,21 +88,22 @@ export default function NewAd() {
               : null,
             tags: [],
           },
+          updateAdId: props.ad.id,
         },
       });
-      if ("id" in result.data.item) {
-        setTitle("");
-        setDescription("");
-        setPrice(0);
-        setpicture("");
-        setCategoryId(null);
-        setOwner("");
-        setLocation("");
-        setHasBeenSent(true);
-        setTimeout(() => {
-          router.push(`/ads/${result.data.item.id}`);
-        }, 1000);
-      }
+      // if ("id" in result.data.item) {
+      //   setTitle("");
+      //   setDescription("");
+      //   setPrice(0);
+      //   setpicture("");
+      //   setCategoryId(null);
+      //   setOwner("");
+      //   setLocation("");
+      //   setHasBeenSent(true);
+      //   setTimeout(() => {
+      //     router.push(`/ads/${result.data.item.id}`);
+      //   }, 1000);
+      // }
     }
   }
 
@@ -108,10 +112,12 @@ export default function NewAd() {
       <main className="main-content">
         <Link href={`/`}>Retour aux annonces</Link>
         {hasBeenSent ? (
-          <p>Création de votre annonce en cours...</p>
+          <p>Modification de votre annonce en cours...</p>
         ) : (
           <>
-            <p>Poster une nouvelle offre</p>
+            <p>
+              Modification de votre annonce <strong>{props.ad.title}</strong>
+            </p>
             {error === "price" && <p>Le prix doit être positif</p>}
             {error === "title" && (
               <p>Le titre est requis et doit faire plus de 3 caractères</p>
@@ -152,7 +158,7 @@ export default function NewAd() {
                 type="number"
                 name="price"
                 placeholder="0,00€"
-                value={price}
+                value={props.ad.price}
                 onChange={(e) => setPrice(Number(e.target.value))}
               />
               <br />
@@ -180,7 +186,6 @@ export default function NewAd() {
               <select
                 className="text-field"
                 name="category"
-                value={categoryId + ""}
                 onChange={(e) => setCategoryId(Number(e.target.value))}
               >
                 {categories.map((category) => (
@@ -192,7 +197,7 @@ export default function NewAd() {
               <br />
               <br />
               <button type="submit" className="button">
-                Poster mon annonce
+                Sauvegarder les modifications
               </button>
             </form>
           </>
