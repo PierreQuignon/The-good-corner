@@ -45,7 +45,6 @@ export default function NewAd() {
       setCategoryId(categories[0].id);
     }
   }, [categories]);
-  console.log(categoryId, "categoryId");
 
   const [doCreate] = useMutation(mutationCreateAd, {
     refetchQueries: [queryAllAds],

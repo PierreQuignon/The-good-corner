@@ -1,11 +1,19 @@
-to start working :
+To start working :
 
-The first time, copy the variables of.env.sample to a .env file and set it
+git clone of the project
 
-commands on dev :
+npm install separately in frontend and backend folders
+
+Make sure there's an .env file in the backend folder and .env and .env.sample files in the project root.
+
+To start the project :
+
+Open the Docker Desktop application
 
 docker compose -f docker-compose.yml up --build
 
-command to run the docker-compose.prod.yml for production:
+To kill the project :
 
-docker compose -f docker-compose.prod.yml up --build
+Open a new terminal tab and run: docker ps
+
+Run the command followed by the id of all docker images: docker kill 16548484 684848 8448485
